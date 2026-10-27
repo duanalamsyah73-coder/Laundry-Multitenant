@@ -1,0 +1,412 @@
+openapi: 3.0.3
+
+info:
+  title: REST API Laundry Multi-Tenant
+  description: >
+    API untuk mengelola data pesanan laundry pada
+    Platform Pemesanan Laundry Berbasis Web dengan Konsep Multi-Tenant.
+  version: 1.0.0
+
+servers:
+  - url: http://127.0.0.1:8000/api
+    description: Local Development Server
+
+tags:
+  - name: Laundry
+    description: Operasi data pesanan laundry
+
+paths:
+
+  /orders:
+
+    get:
+      tags:
+        - Laundry
+      summary: Mengambil seluruh data pesanan
+      description: Mengembalikan daftar seluruh pesanan laundry.
+      operationId: getAllLaundry
+
+      responses:
+
+        '200':
+          description: Data pesanan berhasil ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LaundryListResponse'
+
+        '500':
+          description: Terjadi kesalahan pada server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+    post:
+      tags:
+        - Laundry
+      summary: Membuat pesanan laundry baru
+      description: Membuat satu data pesanan laundry baru.
+      operationId: createLaundry
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LaundryInput'
+
+            example:
+              tenant_id: 1
+              customer_id: 10
+              service_id: 3
+              weight: 3
+              pickup_type: "datang_langsung"
+              address: null
+
+      responses:
+
+        '201':
+          description: Pesanan berhasil dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LaundryResponse'
+
+        '400':
+          description: Data yang dikirim tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        '500':
+          description: Terjadi kesalahan pada server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+  /orders/{id}:
+
+    get:
+      tags:
+        - Laundry
+      summary: Mengambil pesanan berdasarkan ID
+      description: Mengembalikan satu data pesanan berdasarkan ID.
+      operationId: getLaundryById
+
+      parameters:
+
+        - name: id
+          in: path
+          description: ID pesanan
+          required: true
+          schema:
+            type: integer
+            example: 1
+
+      responses:
+
+        '200':
+          description: Data pesanan ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LaundryResponse'
+
+        '404':
+          description: Pesanan tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        '500':
+          description: Terjadi kesalahan pada server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+    patch:
+      tags:
+        - Laundry
+      summary: Memperbarui data pesanan
+      description: Mengubah data atau status pesanan berdasarkan ID.
+      operationId: updateLaundry
+
+      parameters:
+
+        - name: id
+          in: path
+          description: ID pesanan
+          required: true
+          schema:
+            type: integer
+            example: 1
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LaundryUpdateInput'
+
+            example:
+              status: "Diproses"
+              payment_status: "Sudah Dibayar"
+
+      responses:
+
+        '200':
+          description: Pesanan berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LaundryResponse'
+
+        '400':
+          description: Data yang dikirim tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        '404':
+          description: Pesanan tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        '500':
+          description: Terjadi kesalahan pada server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+    delete:
+      tags:
+        - Laundry
+      summary: Menghapus atau membatalkan pesanan
+      description: Menghapus atau membatalkan pesanan berdasarkan ID.
+      operationId: deleteLaundry
+
+      parameters:
+
+        - name: id
+          in: path
+          description: ID pesanan
+          required: true
+          schema:
+            type: integer
+            example: 1
+
+      responses:
+
+        '200':
+          description: Pesanan berhasil dihapus
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+
+        '404':
+          description: Pesanan tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        '500':
+          description: Terjadi kesalahan pada server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+components:
+
+  schemas:
+
+    Laundry:
+      type: object
+      properties:
+
+        id:
+          type: integer
+          example: 1
+
+        tenant_id:
+          type: integer
+          example: 1
+
+        customer_id:
+          type: integer
+          example: 10
+
+        service_id:
+          type: integer
+          example: 3
+
+        order_code:
+          type: string
+          example: "TRX-001"
+
+        weight:
+          type: number
+          example: 3
+
+        total:
+          type: number
+          example: 30000
+
+        payment_status:
+          type: string
+          example: "Menunggu Pembayaran"
+
+        status:
+          type: string
+          example: "Menunggu Pembayaran"
+
+        pickup_type:
+          type: string
+          example: "datang_langsung"
+
+        address:
+          type: string
+          nullable: true
+          example: null
+
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-09-24T10:00:00Z"
+
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-09-24T10:00:00Z"
+
+
+    LaundryInput:
+      type: object
+      required:
+        - tenant_id
+        - customer_id
+        - service_id
+        - weight
+        - pickup_type
+
+      properties:
+
+        tenant_id:
+          type: integer
+          example: 1
+
+        customer_id:
+          type: integer
+          example: 10
+
+        service_id:
+          type: integer
+          example: 3
+
+        weight:
+          type: number
+          example: 3
+
+        pickup_type:
+          type: string
+          example: "datang_langsung"
+
+        address:
+          type: string
+          nullable: true
+          example: null
+
+
+    LaundryUpdateInput:
+      type: object
+
+      properties:
+
+        payment_status:
+          type: string
+          example: "Sudah Dibayar"
+
+        status:
+          type: string
+          example: "Diproses"
+
+        pickup_type:
+          type: string
+          example: "diambil"
+
+        address:
+          type: string
+          nullable: true
+          example: "Jl. Contoh No. 10"
+
+
+    LaundryResponse:
+      type: object
+
+      properties:
+
+        status:
+          type: string
+          example: "success"
+
+        data:
+          $ref: '#/components/schemas/Laundry'
+
+
+    LaundryListResponse:
+      type: object
+
+      properties:
+
+        status:
+          type: string
+          example: "success"
+
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Laundry'
+
+
+    DeleteResponse:
+      type: object
+
+      properties:
+
+        status:
+          type: string
+          example: "success"
+
+        message:
+          type: string
+          example: "Pesanan berhasil dihapus"
+
+
+    ErrorResponse:
+      type: object
+
+      properties:
+
+        status:
+          type: string
+          example: "error"
+
+        message:
+          type: string
+          example: "Pesanan tidak ditemukan"
