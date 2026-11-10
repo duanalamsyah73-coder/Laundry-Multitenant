@@ -8,41 +8,49 @@ use Illuminate\Http\Request;
 
 class TenantController extends Controller
 {
+    // Menampilkan semua tenant yang aktif
     public function index()
     {
-        $tenant = Tenant::all();
+        $tenants = Tenant::where('status', 'Aktif')->get();
 
         return response()->json([
             'status' => 'success',
-            'data' => $tenant
-        ]);
+            'data' => $tenants
+        ], 200);
     }
 
+    // Menampilkan detail tenant yang aktif
     public function show($id)
     {
-        $tenant = Tenant::find($id);
+        $tenant = Tenant::where('status', 'Aktif')->find($id);
 
         if (!$tenant) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Tenant tidak ditemukan'
+                'message' => 'Tenant tidak ditemukan atau tidak aktif'
             ], 404);
         }
 
         return response()->json([
             'status' => 'success',
             'data' => $tenant
-        ]);
+        ], 200);
     }
 
+    // Menambahkan tenant baru
     public function store(Request $request)
     {
-        $tenant = Tenant::create([
-            'nama' => $request->nama,
-            'alamat' => $request->alamat,
-            'no_telepon' => $request->no_telepon,
-            'jenis_laundry' => $request->jenis_laundry,
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'owner' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string',
+            'description' => 'nullable|string',
+            'status' => 'required|in:Aktif,Nonaktif',
         ]);
+
+        $tenant = Tenant::create($validated);
 
         return response()->json([
             'status' => 'success',
