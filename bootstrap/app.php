@@ -1,3 +1,4 @@
+
 <?php
 
 use App\Http\Middleware\ResolveTenantContext;
@@ -14,15 +15,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-    $middleware->alias([
-        'tenant.context' => ResolveTenantContext::class,
-    ]);
+        $middleware->alias([
+            'tenant.context' => ResolveTenantContext::class,
+        ]);
 
-    $middleware->prependToPriorityList(
-        \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        ResolveTenantContext::class,
-    );
-})
+        $middleware->prependToPriorityList(
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            ResolveTenantContext::class,
+        );
+    })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
